@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mshaheen <mshaheen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/16 12:05:07 by mshaheen          #+#    #+#             */
-/*   Updated: 2024/07/18 10:16:49 by mshaheen         ###   ########.fr       */
+/*   Created: 2024/07/18 09:23:18 by mshaheen          #+#    #+#             */
+/*   Updated: 2024/07/18 10:14:59 by mshaheen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 void	*ft_calloc(size_t count, size_t size)
 {
@@ -74,7 +74,7 @@ char	*ft_getline(char *str)
 	return (s);
 }
 
-char	*ft_nextline(char **str)
+char	*ft_nextline(char *str)
 {
 	char	*s;
 	size_t	i;
@@ -82,25 +82,25 @@ char	*ft_nextline(char **str)
 	i = 0;
 	if (!*str)
 		return (NULL);
-	while (str[0][i] && str[0][i] != '\n')
+	while (str[i] && str[i] != '\n')
 		i++;
-	if (str[0][i] && str[0][i] == '\n')
+	if (str[i] && str[i] == '\n')
 		i++;
-	s = ft_strdup(*str + i);
+	s = ft_strdup(str + i);
 	if (!s)
 	{
-		free(*str);
+		free(str);
 		return (NULL);
 	}
-	free(*str);
-	*str = NULL;
+	free(str);
+	str = NULL;
 	return (s);
 }
 
 char	*get_next_line(int fd)
 {
 	char		*buff;
-	static char	*str;
+	static char	*str[1024];
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || BUFFER_SIZE >= INT_MAX)
@@ -108,17 +108,17 @@ char	*get_next_line(int fd)
 	buff = ft_calloc((size_t)(BUFFER_SIZE + 1), sizeof(char));
 	if (!buff)
 		return (NULL);
-	str = ft_readline(fd, buff, str);
-	if (!str)
+	str[fd] = ft_readline(fd, buff, str[fd]);
+	if (!str[fd])
 		return (NULL);
-	line = ft_getline(str);
-	str = ft_nextline(&str);
-	if (!str)
+	line = ft_getline(str[fd]);
+	str[fd] = ft_nextline(str[fd]);
+	if (!str[fd])
 		return (NULL);
-	if (!*str)
+	if (!*str[fd])
 	{
-		free(str);
-		str = NULL;
+		free(str[fd]);
+		str[fd] = NULL;
 	}
 	return (line);
 }
